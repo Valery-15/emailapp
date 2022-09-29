@@ -1,0 +1,239 @@
+﻿@model EmailApp.ViewModels.LetterViewModel
+@{
+    ViewData["Title"] = "Profile";
+}
+
+
+
+<nav class="navbar">
+    <form class="form-inline">
+        <h1 class="text-danger">Hi, @ViewData["username"]</h1>
+    </form>
+    <form class="form-inline">
+        <a class="btn btn-dark" href="~/Home/Index" id="returnhome">Back</a>
+    </form>
+</nav>
+
+<br/>
+
+
+
+ 
+<form method="post" asp-controller="Email" asp-action="SendLetter">
+    <h2 class="text-success">New letter</h2>
+
+
+    @if (ViewData["Message"] != null)
+    {
+        <p>@ViewData["Message"]</p>
+    }
+
+    <div asp-validation-summary="ModelOnly"></div>
+
+    <input type="hidden" value="@ViewData["username"]" name="username" id="username" />
+
+    <div class="form-group row">
+        <label style="font-weight:600;font-size: 20px" asp-for="Recipient" class="col-sm-2 col-form-label">Recipient:</label>
+        <div class="col-sm-10">
+            <input class="form-control" asp-for="Recipient" id="recipient" autocomplete="off">
+        </div>
+        <span asp-validation-for="Recipient"></span>
+    </div>
+
+    <div class="form-group row">
+        <label style="font-weight:600;font-size: 20px" asp-for="Theme" class="col-sm-2 col-form-label">Theme:</label>
+        <div class="col-sm-10">
+            <input class="form-control" asp-for="Theme" autocomplete="off">
+        </div>
+        <span asp-validation-for="Theme"></span>
+    </div>
+
+    <div class="form-group row">
+        <label style="font-weight:600;font-size: 20px" asp-for="Message" class="col-sm-2 col-form-label">Message:</label>
+        <div class="col-sm-10">
+            <textarea class="form-control" asp-for="Message" autocomplete="off"></textarea>
+        </div>
+        <span asp-validation-for="Message"></span>
+    </div>
+
+    <div style="justify-content:center">
+        <input type="submit" class="btn btn-success" value="Send letter" /><br /><br /><br />
+    </div>
+
+</form>
+
+
+    <h2 >My Letters</h2>
+    <table id="letters" class="table table-striped table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th>Date</th>
+                <th>From</th>
+                <th>Theme</th>
+                <th>Message</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+
+
+<script>
+    //var usersList;
+    //update_autocomplete_list();
+
+    //function update_autocomplete_list() {
+    //    var url = 'Email/UpdateAutocompleteList';
+    //    fetch(url)
+    //        .then(res => res.json())
+    //        .then(users => {
+    //            console.log(users);
+    //            usersList = users;
+    //            setTimeout(update_autocomplete_list, 5000);
+    //        })
+    //        .catch(e => {
+    //            console.log('Error: ', e);
+    //            setTimeout(update_autocomplete_list, 5000);
+    //        });
+
+    //}
+
+
+    var username = document.querySelector("input[id='username']").value;
+
+    var letters_table = document.getElementById('letters');
+    update_letters();
+
+    function update_letters() {
+        var url = 'Email/UpdateLetters?username=' + username;
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                console.log('data: ', data)
+                clearTable(letters_table, 1);
+
+                data.forEach((letter) => {
+                    var tr = document.createElement('tr');
+                    var td;
+
+                    td = document.createElement('td');
+                    td.innerHTML = letter.sendDateTime;
+                    tr.appendChild(td);
+
+                    td = document.createElement('td');
+                    td.innerHTML = letter.sender;
+                    tr.appendChild(td);
+
+                    td = document.createElement('td');
+                    td.innerHTML = letter.theme;
+                    tr.appendChild(td);
+
+                    td = document.createElement('td');
+                    td.innerHTML = letter.body;
+                    tr.appendChild(td);
+
+                    letters_table.append(tr);
+                });
+                setTimeout(update_letters, 5000);
+            })
+            .catch(e => {
+                console.log('Error: ', e);
+                setTimeout(update_letters, 5000);
+            });
+    }
+
+    function clearTable(table, offset = 0) {
+        let rowCount = table.rows.length;
+        for (var i = offset; i < rowCount; i++) {
+            table.deleteRow(offset);
+        }
+    }
+
+
+</script>
+
+
+@*var id = letter.Id.ToString();
+    var datatarget = "#" + id;
+    <div class="card">
+
+        <div class="card card-header">
+            <a class="btn" data-target="@datatarget" data-toggle="collapse" aria-expanded="true" aria-controls="@id">
+                @letter.SendDateTime <br />
+                From:  @letter.Sender <br />
+                Theme: @letter.Theme <br />
+                Message: @letter.Body
+            </a>
+        </div>
+
+        <div class="collapse" id="@id">
+            <div class="card card-body">
+                @letter.Body
+            </div>
+        </div>
+    </div>*@
+
+
+@*
+    async function elementUpdate(selector) {
+        try {
+            var html = await (await fetch(location.href)).text();
+            var newdoc = new DOMParser().parseFromString(html, 'text/html');
+            document.querySelector(selector).outerHTML = newdoc.querySelector(selector).outerHTML;
+            console.log('Элемент ' + selector + ' был успешно обновлен');
+            return true;
+        } catch (err) {
+            console.log('При обновлении элемента ' + selector + ' произошла ошибка:');
+            console.dir(err);
+            return false;
+        }
+    }
+*@
+
+
+@*<form method="post" action="/Email/SendLetter">
+        <h2>New letter</h2><br />
+        <input type="hidden" value="@ViewData["username"]" name="username" id="username" />
+        <div>
+            <label for="recipient">Recipient:</label>
+            <input type="text" id="recipient" name="Recipient" /><br />
+        </div>
+
+        <label for="theme">Theme:</label>
+        <input type="text" id="theme" name="Theme" /><br />
+
+        <label for="message">Message:</label>
+        <input type="text" id="message" name="Message" /><br />
+
+        <input type="submit" class="btn btn-outline-success" value="Send Letter" /><br />
+    </form>*@
+
+
+@*<form method="post" asp-controller="Email" asp-action="SendLetter">
+        <h2>New letter</h2><br />
+
+        <div asp-validation-summary="ModelOnly"></div>
+
+        <input type="hidden" value="@ViewData["username"]" name="username" id="username" />
+
+        <div>
+            <label asp-for="Recipient"></label><br />
+            <br /><input asp-for="Recipient" />
+            <span asp-validation-for="Recipient"></span>
+            <br />
+        </div>
+        <div>
+            <br /><label asp-for="Theme"></label><br />
+            <br /><input asp-for="Theme" />
+            <span asp-validation-for="Theme"></span>
+        </div>
+        <div>
+            <br /><label asp-for="Message"></label><br />
+            <br /><input asp-for="Message" />
+            <span asp-validation-for="Message"></span>
+        </div>
+        <div>
+            <br /><input type="submit" class="btn btn-outline-success" value="Send letter" /><br />
+        </div>
+    </form>*@
